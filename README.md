@@ -19,16 +19,16 @@
 ## 🛠️ Công Nghệ Sử Dụng
 
 - **Spring Boot**
-    - Spring Boot Starter Data JDBC
-    - Spring Boot Starter Data JPA
-    - Spring Boot Starter OAuth2 Client
-    - Spring Boot Starter Security
-    - Spring Boot Starter Web
-    - Spring Boot Devtools
-    - Spring Boot Starter OAuth2 Resource Server
-    - Spring Boot Starter Thymeleaf
-    - Spring Boot Starter Validation
-    - Spring Boot Starter Mail
+  - Spring Boot Starter Data JDBC
+  - Spring Boot Starter Data JPA
+  - Spring Boot Starter OAuth2 Client
+  - Spring Boot Starter Security
+  - Spring Boot Starter Web
+  - Spring Boot Devtools
+  - Spring Boot Starter OAuth2 Resource Server
+  - Spring Boot Starter Thymeleaf
+  - Spring Boot Starter Validation
+  - Spring Boot Starter Mail
 - **PostgreSQL** - Cơ sở dữ liệu quan hệ mạnh mẽ và phổ biến.
 - **Hibernate Validator** - Xác thực dữ liệu linh hoạt và mạnh mẽ.
 - **Jackson** - Chuyển đổi giữa Java Objects và JSON.
