@@ -1,0 +1,18 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+#            DevProjectLab
+            client-id: 938223575199-803kaf7nnogndb2mce1bcc45esjpe1ko.apps.googleusercontent.com
+            client-secret: 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
+            scope: profile, email, openid
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-name: Google
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub
