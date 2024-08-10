@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -62,6 +63,18 @@ public class AuthController {
         Map<String, Object> response = accountService.login(loginRequest);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody String email) {
+        accountService.requestPasswordReset(email);
+        return new ResponseEntity<>("Password reset link sent to your email.", HttpStatus.OK);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody String token, @RequestBody String newPassword) {
+        accountService.resetPassword(token, newPassword);
+        return new ResponseEntity<>("Password reset successful.", HttpStatus.OK);
+    }
+
 
     @GetMapping("/logout")
     public String logout() {

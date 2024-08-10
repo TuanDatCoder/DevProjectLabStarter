@@ -24,4 +24,9 @@ public String home(@AuthenticationPrincipal OAuth2User principal) {
     public String showRegisterForm() {
         return "register";
     }
+
+    @GetMapping("/login")
+    public String showLoginForm() {
+        return "login";
+    }
 }

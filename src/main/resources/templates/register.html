@@ -20,30 +20,84 @@
     .register-header {
       margin-bottom: 20px;
     }
+    .notification {
+      display: none;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
 <div class="register-container">
   <h2 class="register-header text-center">Register</h2>
-  <form action="/register" method="post">
-    <div class="form-group">
-      <label for="name">Name:</label>
-      <input type="text" class="form-control" id="name" name="name" required>
-    </div>
+  <div id="notification" class="notification alert alert-info text-center"></div>
+  <form id="registerForm">
     <div class="form-group">
       <label for="email">Email:</label>
       <input type="email" class="form-control" id="email" name="email" required>
     </div>
     <div class="form-group">
+      <label for="name">Name:</label>
+      <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+    <div class="form-group">
+      <label for="gender">Gender:</label>
+      <select class="form-control" id="gender" name="gender" required>
+        <option value="MALE">Male</option>
+        <option value="FEMALE">Female</option>
+        <option value="OTHER">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
       <label for="password">Password:</label>
       <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+    <div class="form-group">
+      <label for="role">Role:</label>
+      <select class="form-control" id="role" name="role" required>
+        <option value="USER">User</option>
+        <option value="ADMIN">Admin</option>
+        <option value="STAFF">Staff</option>
+      </select>
     </div>
     <button type="submit" class="btn btn-primary btn-block">Register</button>
   </form>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#registerForm').submit(function(event) {
+      event.preventDefault();
+
+      const formData = {
+        email: $('#email').val(),
+        name: $('#name').val(),
+        gender: $('#gender').val(),
+        password: $('#password').val(),
+        role: $('#role').val()
+      };
+
+      $.ajax({
+        type: 'POST',
+        url: '/auth/register',
+        contentType: 'application/json',
+        data: JSON.stringify(formData),
+        success: function(response) {
+          $('#notification').text(response).addClass('alert-success').show();
+          setTimeout(function() {
+            window.location.href = '/login';
+          }, 3000);
+        },
+        error: function(xhr) {
+          let errorMessage = "Registration failed.";
+          if (xhr.responseText) {
+            errorMessage = xhr.responseText;
+          }
+          $('#notification').text(errorMessage).addClass('alert-danger').show();
+        }
+      });
+    });
+  });
+</script>
 </body>
 </html>

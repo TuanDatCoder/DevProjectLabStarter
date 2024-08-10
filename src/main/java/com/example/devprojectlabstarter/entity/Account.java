@@ -1,5 +1,6 @@
 package com.example.devprojectlabstarter.entity;
 
+import com.example.devprojectlabstarter.entity.Enum.AccountGenderEnum;
 import com.example.devprojectlabstarter.entity.Enum.AccountProviderEnum;
 import com.example.devprojectlabstarter.entity.Enum.AccountRoleEnum;
 import com.example.devprojectlabstarter.entity.Enum.AccountStatusEnum;
@@ -30,6 +31,10 @@ public class Account {
 
     @Size(min = 6)
     private String password;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AccountGenderEnum gender;
 
     @Column
     private String picture;
