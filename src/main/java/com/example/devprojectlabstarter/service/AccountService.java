@@ -41,6 +41,9 @@ public class AccountService {
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
 
+    @Autowired
+    private EmailService emailService;
+
     public Account registerNewAccount(RegisterRequest registerRequest) {
         if (accountRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
             throw new AccountException("User existed", ErrorCode.USER_EXISTED);
@@ -50,6 +53,7 @@ public class AccountService {
         account.setEmail(registerRequest.getEmail());
         account.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         account.setName(registerRequest.getName());
+        account.setGender(registerRequest.getGender());
         account.setProvider(AccountProviderEnum.LOCAL);
         account.setRole(registerRequest.getRole());
         account.setStatus(AccountStatusEnum.UNVERIFIED);
@@ -114,6 +118,30 @@ public class AccountService {
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
+
+    public void requestPasswordReset(String email) {
+        Account account = accountRepository.findByEmail(email)
+                .orElseThrow(() -> new AccountException("User not found with email: " + email, ErrorCode.USER_NOT_FOUND));
+
+        String resetToken = jwtTokenUtil.generateToken(new org.springframework.security.core.userdetails.User(email, "", new ArrayList<>()));
+        String resetLink = "http://localhost:8080/auth/reset-password?token=" + resetToken;
+
+        emailService.sendResetPasswordEmail(email, account.getName(), resetLink);
+    }
+    public void resetPassword(String token, String newPassword) {
+        try {
+            String email = jwtTokenUtil.getUsernameFromToken(token);
+            Account account = accountRepository.findByEmail(email)
+                    .orElseThrow(() -> new AccountException("User not found with email: " + email, ErrorCode.USER_NOT_FOUND));
+
+            account.setPassword(passwordEncoder.encode(newPassword));
+            accountRepository.save(account);
+        } catch (Exception e) {
+            throw new AccountException("Invalid or expired token", ErrorCode.TOKEN_INVALID);
+        }
+    }
+
+
 
     private AccountResponseDTO convertToDto(Account account) {
         AccountResponseDTO dto = new AccountResponseDTO();

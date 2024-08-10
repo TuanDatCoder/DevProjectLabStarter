@@ -138,7 +138,16 @@
             <artifactId>firebase-admin</artifactId>
             <version>9.3.0</version>
         </dependency>
-
+        <!--Chat-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        <!--Flyway-->
+<!--        <dependency>-->
+<!--            <groupId>org.flywaydb</groupId>-->
+<!--            <artifactId>flyway-core</artifactId>-->
+<!--        </dependency>-->
         <!-- Servlet and JAXB Dependencies -->
         <dependency>
             <groupId>javax.servlet</groupId>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Chat</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/sockjs/1.1.4/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <style>
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 80vh;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+    .chat-message {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+    .message-sender {
+      align-items: flex-end;
+    }
+    .message-content {
+      padding: 10px;
+      border-radius: 20px;
+      max-width: 60%;
+    }
+    .message-content-sender {
+      background-color: #007bff;
+      color: white;
+    }
+    .message-content-receiver {
+      background-color: #f1f0f0;
+      color: black;
+    }
+    .sender-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .username-display {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="container mt-5">
+  <div id="username-page" class="text-center">
+    <h2>WebSocket Chat</h2>
+    <input type="text" id="name" class="form-control mb-2" placeholder="Enter your name"/>
+    <button id="connect" class="btn btn-primary">Connect</button>
+  </div>
+  <div id="chat-page" class="d-none">
+    <div id="username-display" class="username-display text-center"></div>
+    <div id="conversation" class="chat-container"></div>
+    <div class="input-group">
+      <input type="text" id="message" class="form-control" placeholder="Type a message..."/>
+      <div class="input-group-append">
+        <button id="send" class="btn btn-success">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var stompClient = null;
+  var username = null;
+
+  function connect(event) {
+    username = document.querySelector('#name').value.trim();
+
+    if(username) {
+      var socket = new SockJS('/ws');
+      stompClient = Stomp.over(socket);
+
+      stompClient.connect({}, onConnected, onError);
+    }
+    event.preventDefault();
+  }
+
+  function onConnected() {
+    document.querySelector('#username-page').classList.add('d-none');
+    document.querySelector('#chat-page').classList.remove('d-none');
+
+    document.querySelector('#username-display').textContent = username;
+
+    stompClient.subscribe('/topic/public', onMessageReceived);
+
+    stompClient.send("/app/chat.addUser",
+            {},
+            JSON.stringify({sender: username, type: 'JOIN'})
+    )
+  }
+
+  function onError(error) {
+    console.log('Could not connect to WebSocket server. Please refresh this page to try again!');
+  }
+
+  function sendMessage(event) {
+    var messageContent = document.querySelector('#message').value.trim();
+
+    if(messageContent && stompClient) {
+      var chatMessage = {
+        sender: username,
+        content: messageContent,
+        type: 'CHAT'
+      };
+
+      stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
+      document.querySelector('#message').value = '';
+    }
+    event.preventDefault();
+  }
+
+  function onMessageReceived(payload) {
+    var message = JSON.parse(payload.body);
+
+    var messageElement = document.createElement('div');
+    messageElement.classList.add('chat-message');
+
+    var messageContentElement = document.createElement('div');
+    messageContentElement.classList.add('message-content');
+
+    if(message.sender === username) {
+      messageElement.classList.add('message-sender');
+      messageContentElement.classList.add('message-content-sender');
+    } else {
+      messageContentElement.classList.add('message-content-receiver');
+    }
+
+    var senderNameElement = document.createElement('div');
+    senderNameElement.classList.add('sender-name');
+    senderNameElement.textContent = message.sender;
+
+    messageContentElement.textContent = message.content;
+
+    messageElement.appendChild(senderNameElement);
+    messageElement.appendChild(messageContentElement);
+
+    document.querySelector('#conversation').appendChild(messageElement);
+    document.querySelector('#conversation').scrollTop = document.querySelector('#conversation').scrollHeight;
+  }
+
+  document.querySelector('#connect').addEventListener('click', connect, true);
+  document.querySelector('#send').addEventListener('click', sendMessage, true);
+</script>
+</body>
+</html>
