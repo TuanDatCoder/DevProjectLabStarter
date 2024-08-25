@@ -64,13 +64,13 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody String email) {
+    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
         accountService.requestPasswordReset(email);
         return new ResponseEntity<>("Password reset link sent to your email.", HttpStatus.OK);
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestBody String token, @RequestBody String newPassword) {
+    public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
         accountService.resetPassword(token, newPassword);
         return new ResponseEntity<>("Password reset successful.", HttpStatus.OK);
     }
