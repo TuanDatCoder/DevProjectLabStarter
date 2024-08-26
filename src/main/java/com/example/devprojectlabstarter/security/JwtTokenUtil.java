@@ -16,6 +16,7 @@ public class JwtTokenUtil implements Serializable {
 
     private static final long serialVersionUID = -2550185165626007488L;
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+    public static final long REFRESH_TOKEN_VALIDITY = 7 * 24 * 60 * 60; // 7 days
 
     @Value("${jwt.secret}")
     private String secret;
@@ -49,17 +50,28 @@ public class JwtTokenUtil implements Serializable {
 
     // Tạo JWT token từ thông tin người dùng
     public String generateToken(UserDetails userDetails) {
-        return doGenerateToken(userDetails.getUsername());
+        return doGenerateToken(userDetails.getUsername(), JWT_TOKEN_VALIDITY);
     }
 
+    // Tạo Refresh Token
+    public String generateRefreshToken(UserDetails userDetails) {
+        return doGenerateToken(userDetails.getUsername(), REFRESH_TOKEN_VALIDITY);
+    }
     // Thực hiện tạo JWT token với subject là username
-    private String doGenerateToken(String subject) {
-        Claims claims = Jwts.claims().setSubject(subject);
-        return Jwts.builder().setClaims(claims).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
+//    private String doGenerateToken(String subject) {
+//        Claims claims = Jwts.claims().setSubject(subject);
+//        return Jwts.builder().setClaims(claims).setIssuedAt(new Date(System.currentTimeMillis()))
+//                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+//                .signWith(SignatureAlgorithm.HS512, secret).compact();
+//    }
+    private String doGenerateToken(String subject, long validityInSeconds) {
+        return Jwts.builder()
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + validityInSeconds * 1000))
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();
     }
-
     // Xác thực JWT token
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
