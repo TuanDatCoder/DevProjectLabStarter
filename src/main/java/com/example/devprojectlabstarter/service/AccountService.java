@@ -1,7 +1,8 @@
 package com.example.devprojectlabstarter.service;
 
 import com.example.devprojectlabstarter.dto.Account.Response.AccountResponseDTO;
-import com.example.devprojectlabstarter.dto.Auth.LoginRequest;
+import com.example.devprojectlabstarter.dto.Auth.Login.LoginRequest;
+import com.example.devprojectlabstarter.dto.Auth.Login.LoginResponseDTO;
 import com.example.devprojectlabstarter.dto.Auth.RegisterRequest;
 import com.example.devprojectlabstarter.entity.Account;
 import com.example.devprojectlabstarter.entity.Enum.AccountProviderEnum;
@@ -15,7 +16,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -81,14 +81,12 @@ public class AccountService {
         }
     }
 
-    public Map<String, Object> login(LoginRequest loginRequest) {
-        Map<String, Object> response = new HashMap<>();
+    public LoginResponseDTO login(LoginRequest loginRequest) {
         Account account = accountRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new AccountException("User not found with email: " + loginRequest.getEmail(), ErrorCode.USER_NOT_FOUND));
 
         if (account.getProvider() != AccountProviderEnum.LOCAL) {
-            response.put("message", "Please log in using Google");
-            return response;
+            return new LoginResponseDTO("Please log in using Google", null, null, null);
         }
 
         try {
@@ -97,15 +95,12 @@ public class AccountService {
             );
 
             UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(loginRequest.getEmail());
-            String token = jwtTokenUtil.generateToken(userDetails);
-
-            response.put("token", token);
-            response.put("message", "Login successful");
+            String accessToken = jwtTokenUtil.generateToken(userDetails);
+            String refreshToken = jwtTokenUtil.generateRefreshToken(userDetails);
+            return new LoginResponseDTO("Login successful", null, accessToken, refreshToken);
         } catch (BadCredentialsException e) {
             throw new AccountException("Invalid email or password", ErrorCode.USERNAME_PASSWORD_NOT_CORRECT);
         }
-
-        return response;
     }
 
     public Optional<Account> findByEmail(String email) {

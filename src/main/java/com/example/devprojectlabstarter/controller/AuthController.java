@@ -1,9 +1,9 @@
 package com.example.devprojectlabstarter.controller;
 
-import com.example.devprojectlabstarter.dto.Auth.LoginRequest;
+import com.example.devprojectlabstarter.dto.Auth.Login.LoginRequest;
+import com.example.devprojectlabstarter.dto.Auth.Login.LoginResponseDTO;
 import com.example.devprojectlabstarter.dto.Auth.RegisterRequest;
 import com.example.devprojectlabstarter.entity.Account;
-import com.example.devprojectlabstarter.entity.Enum.AccountProviderEnum;
 import com.example.devprojectlabstarter.entity.Enum.AccountStatusEnum;
 import com.example.devprojectlabstarter.security.JwtTokenUtil;
 import com.example.devprojectlabstarter.service.AccountService;
@@ -13,14 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -59,10 +55,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
-        Map<String, Object> response = accountService.login(loginRequest);
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequest loginRequest) {
+        LoginResponseDTO response = accountService.login(loginRequest);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestParam String email) {
         accountService.requestPasswordReset(email);
