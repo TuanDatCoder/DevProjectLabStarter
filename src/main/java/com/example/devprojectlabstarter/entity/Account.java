@@ -9,14 +9,20 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
 @Table(name = "account")
-public class Account {
+public class Account implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,4 +63,42 @@ public class Account {
     @Column(name = "create_at", nullable = false)
     private LocalDateTime createAt;
     // Getters and Setters
+
+    @Transient
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+        return authorities;
+    }
+
+    @Transient
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Transient
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // Hoặc tùy thuộc vào logic của bạn
+    }
+
+    @Transient
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // Hoặc tùy thuộc vào logic của bạn
+    }
+
+    @Transient
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // Hoặc tùy thuộc vào logic của bạn
+    }
+
+    @Transient
+    @Override
+    public boolean isEnabled() {
+        return this.status == AccountStatusEnum.VERIFIED; // Hoặc tùy thuộc vào logic của bạn
+    }
 }

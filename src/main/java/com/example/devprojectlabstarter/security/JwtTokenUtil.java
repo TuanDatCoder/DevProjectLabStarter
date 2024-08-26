@@ -57,13 +57,7 @@ public class JwtTokenUtil implements Serializable {
     public String generateRefreshToken(UserDetails userDetails) {
         return doGenerateToken(userDetails.getUsername(), REFRESH_TOKEN_VALIDITY);
     }
-    // Thực hiện tạo JWT token với subject là username
-//    private String doGenerateToken(String subject) {
-//        Claims claims = Jwts.claims().setSubject(subject);
-//        return Jwts.builder().setClaims(claims).setIssuedAt(new Date(System.currentTimeMillis()))
-//                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-//                .signWith(SignatureAlgorithm.HS512, secret).compact();
-//    }
+
     private String doGenerateToken(String subject, long validityInSeconds) {
         return Jwts.builder()
                 .setSubject(subject)

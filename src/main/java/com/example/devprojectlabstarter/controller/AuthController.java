@@ -1,70 +1,49 @@
 package com.example.devprojectlabstarter.controller;
 
-import com.example.devprojectlabstarter.dto.Auth.Login.LoginRequest;
+import com.example.devprojectlabstarter.dto.ApiResponse;
+import com.example.devprojectlabstarter.dto.Auth.Login.LoginRequestDTO;
 import com.example.devprojectlabstarter.dto.Auth.Login.LoginResponseDTO;
-import com.example.devprojectlabstarter.dto.Auth.RegisterRequest;
-import com.example.devprojectlabstarter.entity.Account;
-import com.example.devprojectlabstarter.entity.Enum.AccountStatusEnum;
-import com.example.devprojectlabstarter.security.JwtTokenUtil;
+import com.example.devprojectlabstarter.dto.Auth.Register.RegisterRequestDTO;
 import com.example.devprojectlabstarter.service.AccountService;
-import com.example.devprojectlabstarter.service.EmailService;
-import com.example.devprojectlabstarter.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
 
     @Autowired
     private AccountService accountService;
 
-    @Autowired
-    private EmailService emailService;
-
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) {
-        Account newAccount = accountService.registerNewAccount(registerRequest);
-        if (newAccount.getStatus() == AccountStatusEnum.UNVERIFIED) {
-            String verificationToken = jwtTokenUtil.generateToken(new org.springframework.security.core.userdetails.User(newAccount.getEmail(), "", new ArrayList<>()));
-            String verificationLink = "http://localhost:8080/auth/verify/" + verificationToken;
-            emailService.sendVerificationEmail(newAccount.getEmail(), newAccount.getName(), verificationLink);
-        }
-        return new ResponseEntity<>("Đăng ký thành công, vui lòng kiểm tra email để xác thực tài khoản.", HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<String>> register(@RequestBody RegisterRequestDTO registerRequestDTO) {
+        ApiResponse<String> response = accountService.registerNewAccount(registerRequestDTO);
+        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
     }
-
-    @GetMapping("/verify/{token}")
-    public ResponseEntity<String> verifyAccount(@PathVariable String token) {
-        accountService.verifyAccountByToken(token);
-        return new ResponseEntity<>("Xác thực tài khoản thành công.", HttpStatus.OK);
+    @GetMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logout() {
+        ApiResponse<String> response = accountService.logout();
+        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequest loginRequest) {
-        LoginResponseDTO response = accountService.login(loginRequest);
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+        LoginResponseDTO response = accountService.login(loginRequestDTO);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
+    @GetMapping("/verify/{token}")
+    public ResponseEntity<ApiResponse<String>> verifyAccount(@PathVariable String token) {
+        ApiResponse<String> response = accountService.verifyAccountByToken(token);
+        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
+    }
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
-        accountService.requestPasswordReset(email);
-        return new ResponseEntity<>("Password reset link sent to your email.", HttpStatus.OK);
+    public ResponseEntity<ApiResponse<String>> forgotPassword(@RequestParam String email) {
+        ApiResponse<String> response = accountService.requestPasswordReset(email);
+        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
     }
 
     @PostMapping("/reset-password")
@@ -74,8 +53,4 @@ public class AuthController {
     }
 
 
-    @GetMapping("/logout")
-    public String logout() {
-        return "Logout successful";
-    }
 }
