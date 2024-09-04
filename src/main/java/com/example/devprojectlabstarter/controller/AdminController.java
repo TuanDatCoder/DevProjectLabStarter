@@ -20,6 +20,7 @@ public class AdminController {
     @Autowired
     private AccountService accountService;
 
+    //@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     //@PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/accounts")
     public ResponseEntity<ApiResponse<List<AccountResponseDTO>>> getAllAccounts() {

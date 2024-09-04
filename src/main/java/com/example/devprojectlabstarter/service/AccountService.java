@@ -1,5 +1,6 @@
 package com.example.devprojectlabstarter.service;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.devprojectlabstarter.dto.Account.AccountResponseDTO;
 import com.example.devprojectlabstarter.dto.ApiResponse;
 import com.example.devprojectlabstarter.dto.Auth.Login.LoginRequestDTO;
@@ -10,6 +11,7 @@ import com.example.devprojectlabstarter.entity.Enum.AccountProviderEnum;
 import com.example.devprojectlabstarter.entity.Enum.AccountStatusEnum;
 import com.example.devprojectlabstarter.exception.Account.AccountException;
 import com.example.devprojectlabstarter.exception.ErrorCode;
+import com.example.devprojectlabstarter.exception.Token.InvalidToken;
 import com.example.devprojectlabstarter.repository.AccountRepository;
 import com.example.devprojectlabstarter.security.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,6 +55,7 @@ public class AccountService {
     private ObjectMapper objectMapper;
 
 
+
     public ApiResponse<String> registerNewAccount(RegisterRequestDTO registerRequestDTO) {
         if (accountRepository.findByEmail(registerRequestDTO.getEmail()).isPresent()) {
             throw new AccountException("User existed", ErrorCode.USER_EXISTED);
@@ -64,7 +69,7 @@ public class AccountService {
         account.setProvider(AccountProviderEnum.LOCAL);
         account.setRole(registerRequestDTO.getRole());
         account.setStatus(AccountStatusEnum.UNVERIFIED);
-        account.setCreateAt(LocalDateTime.now());
+        account.setCreatedAt(LocalDateTime.now());
         accountRepository.save(account);
 
         String verificationToken = jwtTokenUtil.generateToken(new org.springframework.security.core.userdetails.User(account.getEmail(), "", new ArrayList<>()));
@@ -76,11 +81,13 @@ public class AccountService {
 
     public ApiResponse<String> verifyAccountByToken(String token) {
         try {
-            String email = jwtTokenUtil.getUsernameFromToken(token);
+            String email = jwtTokenUtil.getEmailFromToken(token); // Sửa tên phương thức
             verifyAccountByEmail(email);
             return new ApiResponse<>(200, "Account verification successful.", null);
-        } catch (Exception e) {
+        } catch (InvalidToken | TokenExpiredException e) {
             throw new AccountException("Invalid token", ErrorCode.TOKEN_INVALID);
+        } catch (Exception e) {
+            throw new AccountException("Error verifying account: " + e.getMessage(), ErrorCode.INTERNAL_ERROR);
         }
     }
 
@@ -109,15 +116,17 @@ public class AccountService {
 
     public ApiResponse<String> resetPassword(String token, String newPassword) {
         try {
-            String email = jwtTokenUtil.getUsernameFromToken(token);
+            String email = jwtTokenUtil.getEmailFromToken(token); // Sửa tên phương thức
             Account account = accountRepository.findByEmail(email)
                     .orElseThrow(() -> new AccountException("User not found with email: " + email, ErrorCode.USER_NOT_FOUND));
 
             account.setPassword(passwordEncoder.encode(newPassword));
             accountRepository.save(account);
             return new ApiResponse<>(200, "Password reset successful.", null);
-        } catch (Exception e) {
+        } catch (InvalidToken | TokenExpiredException e) {
             throw new AccountException("Invalid or expired token", ErrorCode.TOKEN_INVALID);
+        } catch (Exception e) {
+            throw new AccountException("Error resetting password: " + e.getMessage(), ErrorCode.INTERNAL_ERROR);
         }
     }
 
@@ -150,6 +159,7 @@ public class AccountService {
     }
 
 
+
     public Optional<Account> findByEmail(String email) {
         return accountRepository.findByEmail(email);
     }
@@ -161,7 +171,10 @@ public class AccountService {
                 .collect(Collectors.toList());
         return new ApiResponse<>(HttpStatus.OK.value(), "Success", accountDtos);
     }
-
+    public Account getAccountByEmail(String email) {
+        Optional<Account> account = accountRepository.findByEmail(email);
+        return account.orElse(null);
+    }
 
     private AccountResponseDTO convertToDto(Account account) {
         return objectMapper.convertValue(account, AccountResponseDTO.class);

@@ -18,11 +18,10 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
 @Data
 @Entity
 @Table(name = "account")
-public class Account{
+public class Account implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +34,7 @@ public class Account{
     @Column
     private String name;
 
-    @Size(min = 6)
+    @Column
     private String password;
 
     @Column(nullable = false)
@@ -60,7 +59,44 @@ public class Account{
     @Enumerated(EnumType.STRING)
     private AccountStatusEnum status;
 
-    @Column(name = "create_at", nullable = false)
-    private LocalDateTime createAt;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
+    @Transient
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+        authorities.add(new SimpleGrantedAuthority(this.role.name()));
+        return authorities;
+    }
+
+    @Transient
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Transient
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Transient
+    @Override
+    public boolean isAccountNonLocked() {
+        return this.status != AccountStatusEnum.BLOCKED;
+    }
+
+    @Transient
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Transient
+    @Override
+    public boolean isEnabled() {
+        return this.status == AccountStatusEnum.VERIFIED;
+    }
 }

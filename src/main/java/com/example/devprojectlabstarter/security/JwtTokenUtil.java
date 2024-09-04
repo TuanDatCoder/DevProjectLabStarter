@@ -1,6 +1,9 @@
 package com.example.devprojectlabstarter.security;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.example.devprojectlabstarter.exception.Token.InvalidToken;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -15,14 +19,14 @@ import java.util.function.Function;
 public class JwtTokenUtil implements Serializable {
 
     private static final long serialVersionUID = -2550185165626007488L;
-    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60; // 5 hours
     public static final long REFRESH_TOKEN_VALIDITY = 7 * 24 * 60 * 60; // 7 days
 
     @Value("${jwt.secret}")
     private String secret;
 
-    // Lấy username từ JWT token
-    public String getUsernameFromToken(String token) {
+    // Lấy email từ JWT token
+    public String getEmailFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
@@ -32,14 +36,29 @@ public class JwtTokenUtil implements Serializable {
     }
 
     // Lấy một giá trị cụ thể từ JWT token
-    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = getAllClaimsFromToken(token);
-        return claimsResolver.apply(claims);
+    private <T> T getClaimFromToken(String token, Function<Claims, T> claimResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimResolver.apply(claims);
     }
 
     // Lấy tất cả các thông tin từ JWT token bằng cách sử dụng secret key
-    private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+    private Claims extractAllClaims(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secret)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            Instant expiredOn = e.getClaims().getExpiration().toInstant();
+            throw new TokenExpiredException("Token has expired", expiredOn);
+        } catch (JwtException e) {
+            throw new InvalidToken("Invalid token");
+        } catch (Exception e) {
+            throw new InvalidToken("Error parsing token: " + e.getMessage());
+        }
+    }
+    public String extractEmail(String token) {
+        return getEmailFromToken(token);
     }
 
     // Kiểm tra nếu JWT token đã hết hạn
@@ -66,9 +85,11 @@ public class JwtTokenUtil implements Serializable {
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
+
     // Xác thực JWT token
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final String email = getEmailFromToken(token);
+        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
 }

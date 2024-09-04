@@ -27,7 +27,8 @@ public enum ErrorCode {
     INVALID_EMAIL(1100, "Invalid email", HttpStatus.BAD_REQUEST),
     EMAIL_WAIT_VERIFY(1101, "This email has been registered and is not verified, please verify and login", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1102, "This email has been registered, please log in!", HttpStatus.BAD_REQUEST),
-    SUCCESS(200, "Success",HttpStatus.OK);
+    SUCCESS(200, "Success",HttpStatus.OK),
+    INTERNAL_ERROR(1200, "Internal Error", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final Integer code;
     @Setter
