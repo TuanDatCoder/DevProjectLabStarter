@@ -24,6 +24,12 @@ public class AuthController {
         ApiResponse<String> response = accountService.registerNewAccount(registerRequestDTO);
         return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
     }
+
+    @GetMapping("/verify/{token}")
+    public ResponseEntity<ApiResponse<String>> verifyAccount(@PathVariable String token) {
+        ApiResponse<String> response = accountService.verifyAccountByToken(token);
+        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
+    }
     @GetMapping("/logout")
     public ResponseEntity<ApiResponse<String>> logout() {
         ApiResponse<String> response = accountService.logout();
@@ -35,11 +41,7 @@ public class AuthController {
         LoginResponseDTO response = accountService.login(loginRequestDTO);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-    @GetMapping("/verify/{token}")
-    public ResponseEntity<ApiResponse<String>> verifyAccount(@PathVariable String token) {
-        ApiResponse<String> response = accountService.verifyAccountByToken(token);
-        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
-    }
+
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<String>> forgotPassword(@RequestParam String email) {
         ApiResponse<String> response = accountService.requestPasswordReset(email);

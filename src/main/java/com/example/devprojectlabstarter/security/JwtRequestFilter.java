@@ -41,7 +41,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 logger.error("Unable to get JWT Token", e);
             } catch (ExpiredJwtException e) {
                 logger.error("JWT Token has expired", e);
-                // Xử lý việc token hết hạn (ví dụ: cấp token mới hoặc yêu cầu đăng nhập lại)
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Token has expired");
                 return;
@@ -56,12 +55,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
         }
         chain.doFilter(request, response);
     }
+
 
 }

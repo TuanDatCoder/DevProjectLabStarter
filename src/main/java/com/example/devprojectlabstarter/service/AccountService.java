@@ -67,6 +67,10 @@ public class AccountService {
         account.setCreateAt(LocalDateTime.now());
         accountRepository.save(account);
 
+        String verificationToken = jwtTokenUtil.generateToken(new org.springframework.security.core.userdetails.User(account.getEmail(), "", new ArrayList<>()));
+        String verificationLink = "http://localhost:8080/auth/verify/" + verificationToken;
+        emailService.sendVerificationEmail(account.getEmail(), account.getName(), verificationLink);
+
         return new ApiResponse<>(201, "Registration successful, please check your email to verify your account.", null);
     }
 
@@ -77,6 +81,19 @@ public class AccountService {
             return new ApiResponse<>(200, "Account verification successful.", null);
         } catch (Exception e) {
             throw new AccountException("Invalid token", ErrorCode.TOKEN_INVALID);
+        }
+    }
+
+    public void verifyAccountByEmail(String email) {
+        Optional<Account> optionalAccount = accountRepository.findByEmail(email);
+        if (optionalAccount.isPresent()) {
+            Account account = optionalAccount.get();
+            if (account.getStatus() == AccountStatusEnum.UNVERIFIED) {
+                account.setStatus(AccountStatusEnum.VERIFIED);
+                accountRepository.save(account);
+            }
+        } else {
+            throw new AccountException("Account not found", ErrorCode.ACCOUNT_NOT_FOUND);
         }
     }
     public ApiResponse<String> requestPasswordReset(String email) {
@@ -108,16 +125,7 @@ public class AccountService {
         return new ApiResponse<>(200, "Logout successful", null);
     }
 
-    public void verifyAccountByEmail(String email) {
-        Optional<Account> optionalAccount = accountRepository.findByEmail(email);
-        if (optionalAccount.isPresent()) {
-            Account account = optionalAccount.get();
-            account.setStatus(AccountStatusEnum.VERIFIED);
-            accountRepository.save(account);
-        } else {
-            throw new AccountException("Account not found", ErrorCode.ACCOUNT_NOT_FOUND);
-        }
-    }
+
 
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
         Account account = accountRepository.findByEmail(loginRequestDTO.getEmail())
@@ -140,6 +148,7 @@ public class AccountService {
             throw new AccountException("Invalid email or password", ErrorCode.USERNAME_PASSWORD_NOT_CORRECT);
         }
     }
+
 
     public Optional<Account> findByEmail(String email) {
         return accountRepository.findByEmail(email);

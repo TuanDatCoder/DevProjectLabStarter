@@ -20,8 +20,8 @@ public class AdminController {
     @Autowired
     private AccountService accountService;
 
+    //@PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/accounts")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<List<AccountResponseDTO>>> getAllAccounts() {
         ApiResponse<List<AccountResponseDTO>> response = accountService.getAllAccounts();
         return new ResponseEntity<>(response, HttpStatus.OK);

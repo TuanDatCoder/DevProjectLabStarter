@@ -22,7 +22,7 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "account")
-public class Account implements UserDetails {
+public class Account{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,43 +62,5 @@ public class Account implements UserDetails {
 
     @Column(name = "create_at", nullable = false)
     private LocalDateTime createAt;
-    // Getters and Setters
 
-    @Transient
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
-        return authorities;
-    }
-
-    @Transient
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
-
-    @Transient
-    @Override
-    public boolean isAccountNonExpired() {
-        return true; // Hoặc tùy thuộc vào logic của bạn
-    }
-
-    @Transient
-    @Override
-    public boolean isAccountNonLocked() {
-        return true; // Hoặc tùy thuộc vào logic của bạn
-    }
-
-    @Transient
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true; // Hoặc tùy thuộc vào logic của bạn
-    }
-
-    @Transient
-    @Override
-    public boolean isEnabled() {
-        return this.status == AccountStatusEnum.VERIFIED; // Hoặc tùy thuộc vào logic của bạn
-    }
 }

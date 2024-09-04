@@ -27,15 +27,6 @@ public class JwtUserDetailsService implements UserDetailsService {
         return new User(account.getEmail(), account.getPassword(), new ArrayList<>());
     }
 
-    //@Override
-//public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-//    Account account = accountRepository.findByEmail(email)
-//            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-//
-//    // Chuyển đổi các quyền từ AccountRoleEnum thành quyền của Spring Security
-//    SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + account.getRole().name());
-//
-//    return new User(account.getEmail(), account.getPassword(), Collections.singletonList(authority));
-//}
+
 
 }
