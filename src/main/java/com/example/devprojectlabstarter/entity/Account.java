@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 @Data
@@ -62,13 +63,18 @@ public class Account implements UserDetails {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Transient
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority(this.role.name()));
-        return authorities;
-    }
+//    @Transient
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+//        authorities.add(new SimpleGrantedAuthority(this.role.name()));
+//        return authorities;
+//    }
+@Transient
+@Override
+public Collection<? extends GrantedAuthority> getAuthorities() {
+    return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+}
 
     @Transient
     @Override
