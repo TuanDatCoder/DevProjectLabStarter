@@ -37,6 +37,7 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -44,7 +45,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/", "/login**", "/error**", "/auth/login", "/auth/register", "/register").permitAll()
-                                //.requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/**").permitAll()
                                 .anyRequest().authenticated()
                 )

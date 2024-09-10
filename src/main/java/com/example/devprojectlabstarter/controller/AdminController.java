@@ -2,7 +2,7 @@ package com.example.devprojectlabstarter.controller;
 
 import com.example.devprojectlabstarter.dto.Account.AccountResponseDTO;
 import com.example.devprojectlabstarter.dto.ApiResponse;
-import com.example.devprojectlabstarter.service.AccountService;
+import com.example.devprojectlabstarter.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +18,13 @@ import java.util.List;
 public class AdminController {
 
     @Autowired
-    private AccountService accountService;
+    private AdminService adminService;
 
     //@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/accounts")
     public ResponseEntity<ApiResponse<List<AccountResponseDTO>>> getAllAccounts() {
-        ApiResponse<List<AccountResponseDTO>> response = accountService.getAllAccounts();
+        ApiResponse<List<AccountResponseDTO>> response = adminService.getAllAccounts();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

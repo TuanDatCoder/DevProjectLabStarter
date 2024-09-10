@@ -22,7 +22,7 @@ public enum ErrorCode {
     USERNAME_PASSWORD_NOT_CORRECT(1012, "Username or password is not correct", HttpStatus.BAD_REQUEST),
     ACCOUNT_NOT_FOUND(1013,"Account not found", HttpStatus.NOT_FOUND),
     EMAIL_NOT_FOUND(1013,"Email not found, please register account.", HttpStatus.NOT_FOUND),
-
+    UNAUTHORIZED(10014, "Unauthorized access", HttpStatus.UNAUTHORIZED),
     //    Accounts | Emails | CODE: 11XX
     INVALID_EMAIL(1100, "Invalid email", HttpStatus.BAD_REQUEST),
     EMAIL_WAIT_VERIFY(1101, "This email has been registered and is not verified, please verify and login", HttpStatus.BAD_REQUEST),

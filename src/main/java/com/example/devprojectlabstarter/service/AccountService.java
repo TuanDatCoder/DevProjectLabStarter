@@ -10,10 +10,12 @@ import com.example.devprojectlabstarter.entity.Account;
 import com.example.devprojectlabstarter.entity.Enum.AccountProviderEnum;
 import com.example.devprojectlabstarter.entity.Enum.AccountStatusEnum;
 import com.example.devprojectlabstarter.exception.Account.AccountException;
+import com.example.devprojectlabstarter.exception.Admin.AdminException;
 import com.example.devprojectlabstarter.exception.ErrorCode;
 import com.example.devprojectlabstarter.exception.Token.InvalidToken;
 import com.example.devprojectlabstarter.repository.AccountRepository;
 import com.example.devprojectlabstarter.security.JwtTokenUtil;
+import com.example.devprojectlabstarter.utils.AccountUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -54,7 +56,8 @@ public class AccountService {
     @Autowired
     private ObjectMapper objectMapper;
 
-
+    @Autowired
+    private AccountUtils accountUtils;
 
     public ApiResponse<String> registerNewAccount(RegisterRequestDTO registerRequestDTO) {
         if (accountRepository.findByEmail(registerRequestDTO.getEmail()).isPresent()) {
@@ -164,18 +167,32 @@ public class AccountService {
         return accountRepository.findByEmail(email);
     }
 
-    public ApiResponse<List<AccountResponseDTO>> getAllAccounts() {
-        List<Account> accounts = accountRepository.findAll();
-        List<AccountResponseDTO> accountDtos = accounts.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-        return new ApiResponse<>(HttpStatus.OK.value(), "Success", accountDtos);
-    }
+
     public Account getAccountByEmail(String email) {
         Optional<Account> account = accountRepository.findByEmail(email);
         return account.orElse(null);
     }
 
+
+    public ApiResponse<AccountResponseDTO> getCurrentAccount() {
+        try {
+            // Retrieve the current account using utility class
+            Account curAccount = accountUtils.getCurrentAccount();
+
+            // Convert the Account entity to AccountResponseDTO
+            AccountResponseDTO accountResponseDTO = convertToDto(curAccount);
+
+            // Return response with success code and message
+            return new ApiResponse<>(HttpStatus.OK.value(), "Account retrieved successfully", accountResponseDTO);
+
+        } catch (AccountException e) {
+            // Return response with error code and message
+            return new ApiResponse<>(e.getErrorCode().getHttpStatus().value(), e.getMessage(), null);
+        } catch (Exception e) {
+            // Return response with internal server error code and message
+            return new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null);
+        }
+    }
     private AccountResponseDTO convertToDto(Account account) {
         return objectMapper.convertValue(account, AccountResponseDTO.class);
     }
