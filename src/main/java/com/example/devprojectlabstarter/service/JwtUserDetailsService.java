@@ -29,7 +29,6 @@ public class JwtUserDetailsService implements UserDetailsService {
         Account account = accountRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-        // Cung cấp danh sách quyền hạn cho UserDetails
         return new org.springframework.security.core.userdetails.User(
                 account.getEmail(),
                 account.getPassword(),
@@ -38,28 +37,8 @@ public class JwtUserDetailsService implements UserDetailsService {
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(Account account) {
-        // Trả về quyền hạn với tiền tố ROLE_
+
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + account.getRole().name()));
     }
-
-//    @Override
-//    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-//        Account account = accountRepository.findByEmail(email)
-//                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-//
-//        // Cung cấp danh sách quyền hạn cho UserDetails
-//        return new org.springframework.security.core.userdetails.User(
-//                account.getEmail(),
-//                account.getPassword(),
-//                getAuthorities(account)
-//        );
-//    }
-//
-//    private Collection<? extends GrantedAuthority> getAuthorities(Account account) {
-//        // Chỉ có một role nên không cần phải lặp qua danh sách
-//        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + account.getRole().name()));
-//    }
-
-
 
 }

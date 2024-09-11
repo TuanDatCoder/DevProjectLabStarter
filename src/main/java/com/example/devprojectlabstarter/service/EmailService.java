@@ -29,12 +29,12 @@ public class EmailService {
                     "<h1>devprojectlabvn</h1>" +
                     "</div>" +
                     "<div style=\"padding: 20px; background-color: #f9f9f9;\">" +
-                    "<h2 style=\"color: #333;\">Chào " + username + ",</h2>" +
-                    "<p style=\"font-size: 16px; color: #555;\">Cảm ơn bạn đã đăng ký tài khoản tại <strong>devprojectlabvn</strong>. Vui lòng nhấp vào nút bên dưới để xác thực tài khoản của bạn:</p>" +
+                    "<h2 style=\"color: #333;\">Hello " + username + ",</h2>" +
+                    "<p style=\"font-size: 16px; color: #555;\">Thank you for registering an account at <strong>devprojectlabvn</strong>. Please click the button below to verify your account:</p>" +
                     "<div style=\"text-align: center; margin: 20px;\">" +
-                    "<a href=\"" + verificationLink + "\" style=\"background-color: #28a745; color: white; padding: 15px 30px; text-decoration: none; font-size: 16px; border-radius: 5px;\">Xác thực tài khoản</a>" +
+                    "<a href=\"" + verificationLink + "\" style=\"background-color: #28a745; color: white; padding: 15px 30px; text-decoration: none; font-size: 16px; border-radius: 5px;\">Verify Account</a>" +
                     "</div>" +
-                    "<p style=\"font-size: 16px; color: #555;\">Nếu bạn không yêu cầu tạo tài khoản này, vui lòng bỏ qua email này.</p>" +
+                    "<p style=\"font-size: 16px; color: #555;\">If you did not request this account, please ignore this email.</p>" +
                     "</div>" +
                     "<div style=\"background-color: #007bff; padding: 10px; text-align: center; color: white;\">" +
                     "<p>&copy; 2024 devprojectlabvn. All rights reserved.</p>" +
@@ -42,6 +42,7 @@ public class EmailService {
                     "</div>" +
                     "</body>" +
                     "</html>";
+
 
             helper.setText(content, true);
             javaMailSender.send(message);

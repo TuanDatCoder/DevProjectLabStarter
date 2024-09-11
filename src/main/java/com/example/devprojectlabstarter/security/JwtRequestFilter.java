@@ -43,13 +43,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String email = null;
         String uri = request.getRequestURI();
 
-        // Bypass filter for login and register endpoints
         if (uri.contains("/auth/login") || uri.contains("/auth/register")) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        // Extract token and email
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
             try {
@@ -69,7 +66,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
 
-        // Authenticate user if email is extracted and there's no existing authentication
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             Account account = accountService.getAccountByEmail(email);
 
@@ -81,7 +77,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
 
-        // Continue the filter chain
         filterChain.doFilter(request, response);
     }
 
