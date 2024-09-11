@@ -56,7 +56,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 account.setRole(AccountRoleEnum.USER);
                 account.setProvider(AccountProviderEnum.GOOGLE);
                 account.setStatus(AccountStatusEnum.VERIFIED);
-                account.setCreateAt(LocalDateTime.now());
+                account.setCreatedAt(LocalDateTime.now());
                 accountRepository.save(account);
             } else {
                 account = existingAccount.get();

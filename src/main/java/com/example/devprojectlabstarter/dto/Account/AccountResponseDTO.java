@@ -1,4 +1,4 @@
-package com.example.devprojectlabstarter.dto.Auth.Login;
+package com.example.devprojectlabstarter.dto.Account;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequest {
+public class AccountResponseDTO {
+    private Long id;
+    private String username;
     private String email;
-    private String password;
-
 
 }

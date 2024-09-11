@@ -2,6 +2,7 @@ package com.example.devprojectlabstarter.exception;
 
 
 
+import com.example.devprojectlabstarter.exception.Admin.AdminException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,9 +19,7 @@ public class CustomExceptionHandler {
         return new ErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    //Goi Class Exception da tao
     @ExceptionHandler(AlreadyExistedException.class)
-    //Tra ve response Status ALREADY_REPORTED
     @ResponseStatus(HttpStatus.ALREADY_REPORTED)
     public ErrorResponse handlerAlreadyExistedException(AlreadyExistedException ex, WebRequest req) {
         return new ErrorResponse(HttpStatus.ALREADY_REPORTED, ex.getMessage());
@@ -30,7 +29,10 @@ public class CustomExceptionHandler {
     public ErrorResponse handlerAccountException(AlreadyExistedException ex, WebRequest req) {
         return new ErrorResponse(HttpStatus.ALREADY_REPORTED, ex.getMessage());
     }
-
+    @ExceptionHandler(AdminException.class)
+    public ErrorResponse handlerAdminException(AlreadyExistedException ex, WebRequest req) {
+        return new ErrorResponse(HttpStatus.ALREADY_REPORTED, ex.getMessage());
+    }
 
 
 }
