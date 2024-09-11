@@ -73,9 +73,9 @@ public class Account implements UserDetails {
 @Transient
 @Override
 public Collection<? extends GrantedAuthority> getAuthorities() {
+    // Trả về quyền hạn mà không có tiền tố ROLE_
     return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
 }
-
     @Transient
     @Override
     public String getUsername() {
