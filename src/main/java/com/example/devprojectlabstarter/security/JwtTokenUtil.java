@@ -25,23 +25,19 @@ public class JwtTokenUtil implements Serializable {
     @Value("${jwt.secret}")
     private String secret;
 
-    // Lấy email từ JWT token
     public String getEmailFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
-    // Lấy ngày hết hạn của JWT token
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    // Lấy một giá trị cụ thể từ JWT token
     private <T> T getClaimFromToken(String token, Function<Claims, T> claimResolver) {
         final Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);
     }
 
-    // Lấy tất cả các thông tin từ JWT token bằng cách sử dụng secret key
     private Claims extractAllClaims(String token) {
         try {
             return Jwts.parser()
@@ -61,18 +57,15 @@ public class JwtTokenUtil implements Serializable {
         return getEmailFromToken(token);
     }
 
-    // Kiểm tra nếu JWT token đã hết hạn
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
 
-    // Tạo JWT token từ thông tin người dùng
     public String generateToken(UserDetails userDetails) {
         return doGenerateToken(userDetails.getUsername(), JWT_TOKEN_VALIDITY);
     }
 
-    // Tạo Refresh Token
     public String generateRefreshToken(UserDetails userDetails) {
         return doGenerateToken(userDetails.getUsername(), REFRESH_TOKEN_VALIDITY);
     }
@@ -86,7 +79,6 @@ public class JwtTokenUtil implements Serializable {
                 .compact();
     }
 
-    // Xác thực JWT token
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String email = getEmailFromToken(token);
         return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));

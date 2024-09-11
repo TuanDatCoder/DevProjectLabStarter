@@ -43,7 +43,6 @@ public class AdminService {
     @Autowired
     private ObjectMapper objectMapper;
 
-
     public ApiResponse<List<AccountResponseDTO>> getAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
         List<AccountResponseDTO> accountDtos = accounts.stream()

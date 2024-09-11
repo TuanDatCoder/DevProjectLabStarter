@@ -176,20 +176,14 @@ public class AccountService {
 
     public ApiResponse<AccountResponseDTO> getCurrentAccount() {
         try {
-            // Retrieve the current account using utility class
             Account curAccount = accountUtils.getCurrentAccount();
-
-            // Convert the Account entity to AccountResponseDTO
             AccountResponseDTO accountResponseDTO = convertToDto(curAccount);
 
-            // Return response with success code and message
             return new ApiResponse<>(HttpStatus.OK.value(), "Account retrieved successfully", accountResponseDTO);
 
         } catch (AccountException e) {
-            // Return response with error code and message
             return new ApiResponse<>(e.getErrorCode().getHttpStatus().value(), e.getMessage(), null);
         } catch (Exception e) {
-            // Return response with internal server error code and message
             return new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null);
         }
     }

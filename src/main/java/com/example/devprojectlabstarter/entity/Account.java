@@ -38,7 +38,7 @@ public class Account implements UserDetails {
     @Column
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     @Enumerated(EnumType.STRING)
     private AccountGenderEnum gender;
 
@@ -63,17 +63,10 @@ public class Account implements UserDetails {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-//    @Transient
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-//        authorities.add(new SimpleGrantedAuthority(this.role.name()));
-//        return authorities;
-//    }
+
 @Transient
 @Override
 public Collection<? extends GrantedAuthority> getAuthorities() {
-    // Trả về quyền hạn mà không có tiền tố ROLE_
     return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
 }
     @Transient
