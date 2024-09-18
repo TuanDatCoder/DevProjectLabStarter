@@ -4,9 +4,8 @@ spring:
       client:
         registration:
           google:
-#            DevProjectLab
-            client-id: 938223575199-803kaf7nnogndb2mce1bcc45esjpe1ko.apps.googleusercontent.com
-            client-secret: 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
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             scope: profile, email, openid
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             client-name: Google
